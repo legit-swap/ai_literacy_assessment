@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Your AI Literacy Snapshot</title>
 
-  <!-- Your site stylesheet (keep relative paths for GitHub Pages) -->
+  <!-- Use your existing stylesheet -->
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Minimal safe defaults in case style.css doesn't define these */
+    /* Minimal safe defaults; your style.css will override where defined */
     body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.5; color: #e9ecf1; background: #0b0d10; }
     .container { max-width: 880px; margin: 24px auto; padding: 0 16px; }
     .card { background: #12151a; border: 1px solid #243042; border-radius: 14px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
@@ -32,7 +32,7 @@
   <div class="container">
     <span class="pill" id="levelPill">—</span>
     <h1>Your AI Literacy Snapshot</h1>
-    <p class="muted">Below is your personalized snapshot. You can optionally record this result to Excel for the AI literacy team.</p>
+    <p class="muted">Below is your personalized snapshot. Your result is already recorded automatically for reporting.</p>
 
     <div class="card">
       <div class="overall">
@@ -46,27 +46,14 @@
       <div id="metrics"></div>
 
       <div class="row">
-        <button id="logToExcel" class="btn">Record this in Excel</button>
         <a class="btn" href="index.html">Retake assessment</a>
       </div>
-      <div class="footer-note">No emails are sent. If you choose to record, a single row is added to the Excel workbook (timestamped automatically by Microsoft Forms).</div>
+      <div class="footer-note">No emails are sent. Submissions are logged automatically (timestamp, BU, and category scores).</div>
     </div>
   </div>
 
   <script>
-    // ========= CONFIG =========
-    // Your Microsoft Forms share link (as provided)
-    const FORMS_BASE = "https://forms.office.com/Pages/ResponsePage.aspx?id=HWuYlG9GwE-rS1xyVgPeqy353c6VaipIj9MJjWAPy2lUNUVROFZWQkZKOVkyTVlDUlBQSVNXTFRORi4u";
-
-    // These MUST match your Form field titles exactly (case/spaces).
-    const FIELD_NAMES = {
-      businessUnit: "Business Unit",
-      overallScore: "Overall Score",
-      categoryScores: "Category Scores"  // single JSON column of all categories
-      // If you prefer separate columns, see the commented "OPTION B" code below.
-    };
-    // ========= END CONFIG =========
-
+    // Labels to match your UI
     const CAT_LABELS = {
       safe: "Safe & Responsible Use",
       everyday: "Everyday Use",
@@ -76,6 +63,8 @@
       sharing: "Sharing & Collaboration",
       productivity: "Productivity"
     };
+
+    // Default order (Productivity added dynamically if present)
     const ORDER = ["safe","everyday","prompting","process","integration","sharing"];
 
     function levelFromScore(s){
@@ -85,8 +74,6 @@
       if(s >= 3.0) return "Building";
       return "Starting";
     }
-
-    function enc(v){ return encodeURIComponent(String(v ?? "")); }
 
     function renderBarRow(name, value){
       const pct = Math.max(0, Math.min(100, (Number(value||0)/5)*100));
@@ -107,7 +94,6 @@
     }
 
     function readBusinessUnit(){
-      // Your app stored BU in localStorage when the form was filled
       try {
         const ls = JSON.parse(localStorage.getItem("aiQuizResult") || "{}");
         if (ls && ls.businessUnit) return ls.businessUnit;
@@ -119,7 +105,6 @@
       const data = readPayloadFromParam() || {};
       const bu = readBusinessUnit();
 
-      // Prepare categories object with only present keys (and order)
       const categories = {};
       ORDER.forEach(k => { if (typeof data[k] === "number") categories[k] = data[k]; });
       if (typeof data.productivity === "number") {
@@ -127,54 +112,17 @@
         if (!ORDER.includes("productivity")) ORDER.push("productivity");
       }
 
-      // Overall + level
       const overall = Number(data.overall || 0);
       document.getElementById("overallScore").textContent = `${overall.toFixed(1)} / 5`;
       document.getElementById("levelPill").textContent = levelFromScore(overall);
       if (bu) document.getElementById("buLine").textContent = `Business Unit: ${bu}`;
 
-      // Bars
       const metricsEl = document.getElementById("metrics");
       metricsEl.innerHTML = "";
       ORDER.forEach(cat => {
         if (typeof categories[cat] === "number") {
           metricsEl.appendChild(renderBarRow(CAT_LABELS[cat] || cat, categories[cat]));
         }
-      });
-
-      // Record to Excel (prefill MS Form)
-      document.getElementById("logToExcel").addEventListener("click", () => {
-        if (!bu || !Number.isFinite(overall)) {
-          alert("Missing Business Unit or Score — please complete the assessment first.");
-          return;
-        }
-
-        // ===== OPTION A: single JSON column with all category scores =====
-        const params = [
-          [FIELD_NAMES.businessUnit, bu],
-          [FIELD_NAMES.overallScore, overall.toFixed(2)],
-          [FIELD_NAMES.categoryScores, JSON.stringify(categories)]
-        ].map(([k,v]) => `${encodeURIComponent(k)}=${enc(v)}`).join("&");
-
-        const url = `${FORMS_BASE}&${params}`;
-        window.open(url, "_blank");
-
-        // ===== OPTION B: separate columns in Excel (uncomment if your Form has these fields) =====
-        /*
-        const params = [
-          [FIELD_NAMES.businessUnit, bu],
-          [FIELD_NAMES.overallScore, overall.toFixed(2)],
-          ["Safe", categories.safe ?? ""],
-          ["Everyday", categories.everyday ?? ""],
-          ["Prompting", categories.prompting ?? ""],
-          ["Process", categories.process ?? ""],
-          ["Integration", categories.integration ?? ""],
-          ["Sharing", categories.sharing ?? ""],
-          ["Productivity", categories.productivity ?? ""], // include only if your Form added it
-        ].map(([k,v]) => `${encodeURIComponent(k)}=${enc(v)}`).join("&");
-        const url = `${FORMS_BASE}&${params}`;
-        window.open(url, "_blank");
-        */
       });
     })();
   </script>
