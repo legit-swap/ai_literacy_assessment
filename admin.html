@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Assessment – Submissions</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0d10; color:#e9ecf1; }
+    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    h1 { margin: 0 0 12px; font-size: 26px; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin: 12px 0 16px; }
+    .btn { padding:10px 14px; border-radius:12px; border:1px solid #243042; background:#0f1319; color:#e9ecf1; cursor:pointer; text-decoration:none; }
+    .btn:hover { background:#151c28; }
+    input[type="search"] { background:#0f1319; border:1px solid #243042; color:#e9ecf1; padding:10px 12px; border-radius:12px; outline:none; min-width: 260px; }
+    table { width:100%; border-collapse: collapse; background:#12151a; border:1px solid #243042; border-radius: 12px; overflow:hidden; }
+    th, td { padding:10px 12px; border-bottom:1px solid #223043; text-align:left; font-size: 14px; vertical-align: top; }
+    th { background:#0f1319; position: sticky; top:0; z-index:1; cursor:pointer; }
+    .muted { color:#aab2bf; font-size: 13px; }
+    .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid #31405a; background:#dfe6ff1a; color:#cfd7ff; }
+    .right { margin-left:auto; }
+    .nowrap { white-space: nowrap; }
+    .scroll { max-height: 70vh; overflow:auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>AI Assessment – Submissions</h1>
+    <div class="controls">
+      <button id="refresh" class="btn">Refresh</button>
+      <a id="download" class="btn" href="https://super-sea-054a.swapneel-kulkarni.workers.dev/download">Download CSV</a>
+      <input id="search" type="search" placeholder="Search BU or values…" />
+      <span id="meta" class="muted right">—</span>
+    </div>
+    <div class="scroll">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th data-k="Timestamp" class="nowrap">Timestamp ▲▼</th>
+            <th data-k="Business Unit">Business Unit ▲▼</th>
+            <th data-k="Overall Score" class="nowrap">Overall Score ▲▼</th>
+            <th data-k="Safe & Responsible Use">Safe & Responsible Use ▲▼</th>
+            <th data-k="Everyday Use">Everyday Use ▲▼</th>
+            <th data-k="Prompting & Iteration">Prompting & Iteration ▲▼</th>
+            <th data-k="Process & Quality">Process & Quality ▲▼</th>
+            <th data-k="Integration & Improvement">Integration & Improvement ▲▼</th>
+            <th data-k="Sharing & Collaboration">Sharing & Collaboration ▲▼</th>
+            <th data-k="Productivity">Productivity ▲▼</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="muted">Data source: <span class="tag">Workers KV</span> · Endpoint: <code>/download</code></p>
+  </div>
+
+  <script>
+    const CSV_URL = "https://super-sea-054a.swapneel-kulkarni.workers.dev/download";
+
+    const headers = [
+      "Timestamp","Business Unit","Overall Score","Safe & Responsible Use",
+      "Everyday Use","Prompting & Iteration","Process & Quality",
+      "Integration & Improvement","Sharing & Collaboration","Productivity"
+    ];
+
+    const state = { rows: [], filtered: [], sortKey: "Timestamp", sortDir: "desc" };
+
+    document.getElementById("refresh").addEventListener("click", load);
+    document.getElementById("search").addEventListener("input", (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) {
+        state.filtered = state.rows.slice();
+      } else {
+        state.filtered = state.rows.filter(r =>
+          headers.some(h => String(r[h] ?? "").toLowerCase().includes(q))
+        );
+      }
+      render();
+    });
+
+    document.querySelectorAll("th[data-k]").forEach(th => {
+      th.addEventListener("click", () => {
+        const k = th.dataset.k;
+        if (state.sortKey === k) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+        else { state.sortKey = k; state.sortDir = "asc"; }
+        render();
+      });
+    });
+
+    function parseCSV(text) {
+      // Simple CSV parser for our clean data (no commas inside numbers; quotes safe)
+      const lines = text.trim().split(/\r?\n/);
+      if (!lines.length) return [];
+      const hdr = lines[0].split(",");
+      return lines.slice(1).map(line => {
+        // handle quoted cells
+        const cells = [];
+        let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i], next = line[i+1];
+          if (ch === '"' && next === '"') { cur += '"'; i++; continue; }
+          if (ch === '"') { inQ = !inQ; continue; }
+          if (ch === ',' && !inQ) { cells.push(cur); cur = ''; continue; }
+          cur += ch;
+        }
+        cells.push(cur);
+        const obj = {};
+        hdr.forEach((h, i) => obj[h] = cells[i] ?? "");
+        return obj;
+      });
+    }
+
+    async function load() {
+      const res = await fetch(CSV_URL, { cache: "no-store" });
+      const text = await res.text();
+      const all = parseCSV(text);
+
+      state.rows = all;
+      state.filtered = all.slice();
+      document.getElementById("meta").textContent =
+        `${all.length} submissions · refreshed ${new Date().toLocaleString()}`;
+      render();
+    }
+
+    function render() {
+      const tb = document.querySelector("#tbl tbody");
+      const dir = state.sortDir === "asc" ? 1 : -1;
+
+      const sorted = state.filtered.slice().sort((a, b) => {
+        const k = state.sortKey;
+        let va = a[k] ?? "", vb = b[k] ?? "";
+
+        // Special sort: Timestamp as date, scores as numbers
+        if (k === "Timestamp") {
+          return (new Date(va) - new Date(vb)) * dir;
+        }
+        const numA = Number(va), numB = Number(vb);
+        if (Number.isFinite(numA) && Number.isFinite(numB)) {
+          return (numA - numB) * dir;
+        }
+        return String(va).localeCompare(String(vb)) * dir;
+      });
+
+      tb.innerHTML = "";
+      for (const r of sorted) {
+        const tr = document.createElement("tr");
+        headers.forEach(h => {
+          const td = document.createElement("td");
+          td.textContent = r[h] ?? "";
+          if (h === "Timestamp") td.className = "nowrap";
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
+      }
+    }
+
+    // initial load
+    load();
+  </script>
+</body>
+</html>
