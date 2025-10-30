@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your AI Literacy Snapshot</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <section id="results" class="results-card" aria-labelledby="results-title">
+      <header class="results-head">
+        <div id="level-badge" class="level-badge">Level</div>
+        <h2 id="results-title" class="results-title">Your AI Literacy Snapshot</h2>
+        <p class="results-subtitle">Below is your snapshot by area.</p>
+      </header>
+
+        <div class="overall-row" id="nps-row" hidden>
+          <div class="overall-left">
+            <div class="overall-label">AI NPS (Productivity pulse)</div>
+            <div class="overall-value" id="nps-value">– / 5</div>
+          </div>
+          <div class="overall-chip" id="nps-chip">—</div>
+        </div>
+   </div>
+      <p class="tiny" id="nps-note" hidden>This pulse is separate from the set of questions and doesn’t affect your overall score.</p>
+        <div class="overall-row">
+        <div class="overall-left">
+          <div class="overall-label">Overall score</div>
+          <div class="overall-value" id="overall-value">– / 5</div>
+        </div>
+        <div class="overall-chip" id="overall-chip">—</div>
+      </div>
+
+      <div class="bars" role="group" aria-label="Scores by area">
+        <div class="bar-row">
+          <div class="bar-label">Safe &amp; Responsible Use</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-safe" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+          <div class="bar-value" id="val-safe">–/5 · —</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Everyday Use</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-everyday" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+          <div class="bar-value" id="val-everyday">–/5 · —</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Prompting &amp; Iteration</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-prompting" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+          <div class="bar-value" id="val-prompting">–/5 · —</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Process &amp; Quality</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-process" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+          <div class="bar-value" id="val-process">–/5 · —</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Integration &amp; Improvement</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-integration" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+          <div class="bar-value" id="val-integration">–/5 · —</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Sharing &amp; Collaboration</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-sharing" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+          <div class="bar-value" id="val-sharing">–/5 · —</div>
+        </div>
+      </div>
+
+      <div id="guardrail" class="guardrail" role="status" hidden>
+        ⚠️ <strong>Safety first.</strong> You’re moving fast — strengthen privacy and bias checks before scaling your use.
+      </div>
+   </div>
+   </div>
+</div>
+</div>
+</div></div></div>
+
+
+      <h3 class="ns-title">Next steps</h3>
+      <div class="ns-buttons">
+        <a class="btn secondary" href="https://gencentral.gendigital.com/sites/people-culture/SitePageModern/55041/ai-learning-hub" target="_blank" rel="noopener">
+          Go to the AI Learning Hub
+        </a>
+      </div>
+      <p class="tiny">No emails are sent. Your results are saved to help us spot team‑wide trends.</p>
+
+      <footer class="results-footer">
+        <a class="linkish" id="start-again" href="index.html">Start again</a>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    const DIMENSION_MAP_6 = { safe:[0,1], everyday:[2,3], prompting:[4,5,6], process:[7,8], integration:[9,10,11,12], sharing:[13] };
+    const DIMENSION_MAP_7 = { safe:[0,1], everyday:[2,3], prompting:[4,5,6], process:[7,8], integration:[9,10,11,12], sharing:[13], productivity:[14] };
+    const average = (arr)=>arr.reduce((a,b)=>a+b,0)/arr.length;
+    const levelFromScore = (avg)=> avg < 2.6 ? "Foundational" : (avg <= 3.8 ? "Proficient" : "Advanced");
+    const ratingLabel = (v)=> v < 2.6 ? "Needs focus" : (v <= 3.8 ? "Building" : "Strong");
+const NPS_LABELS = ["Never","Rarely","Sometimes","Often","Always"];
+
+    function setBar(idFill,idVal,value){
+      const pct = Math.max(0, Math.min(100, ((value-1)/4)*100));
+      const fill = document.getElementById(idFill);
+      const val  = document.getElementById(idVal);
+      fill.style.width = pct + "%";
+      fill.setAttribute("aria-valuenow", value.toFixed(1));
+      val.textContent = `${value.toFixed(1)}/5 · ${ratingLabel(value)}`;
+    }
+    function appendProductivityBar(){
+      if(document.getElementById("bar-productivity")) return;
+      const container = document.querySelector(".bars");
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML = `
+        <div class="bar-label">Productivity (Time/quality gain)</div>
+        <div class="bar-track"><div class="bar-fill" id="bar-productivity" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
+        <div class="bar-value" id="val-productivity">–/5 · —</div>
+      `;
+      container.appendChild(row);
+    }
+    function renderResults(scores){
+      const aiNps = scores.aiNps;
+      const {safe,everyday,prompting,process,integration,sharing,overall,productivity} = scores;
+      const level = levelFromScore(overall);
+      document.getElementById("level-badge").textContent = level;
+      document.getElementById("overall-value").textContent = `${overall.toFixed(1)} / 5`;
+      document.getElementById("overall-chip").textContent = level;
+
+      setBar("bar-safe","val-safe",safe);
+      setBar("bar-everyday","val-everyday",everyday);
+      setBar("bar-prompting","val-prompting",prompting);
+      setBar("bar-process","val-process",process);
+      setBar("bar-integration","val-integration",integration);
+      setBar("bar-sharing","val-sharing",sharing);
+
+      if(typeof productivity === "number"){
+        appendProductivityBar();
+        setBar("bar-productivity","val-productivity",productivity);
+      }
+
+      // Render AI NPS if present
+      if(typeof aiNps === "number"){
+        const row = document.getElementById("nps-row");
+        row.hidden = false;
+        const lab = NPS_LABELS[Math.max(1, Math.min(5, aiNps)) - 1] || "—";
+        document.getElementById("nps-value").textContent = `${aiNps}/5`;
+        const note = document.getElementById("nps-note");
+        if (note) note.hidden = false;
+        document.getElementById("nps-chip").textContent = lab;
+      }
+
+      const guard = document.getElementById("guardrail");
+      guard.hidden = !(overall >= 3.0 && safe < 2.4);
+    }
+    function getScoresFromUrl(){
+      try{
+        const p = new URLSearchParams(location.search).get("p");
+        if(!p) return null;
+        const decoded = JSON.parse(atob(decodeURIComponent(p)));
+        const keys = ["safe","everyday","prompting","process","integration","sharing","overall"];
+        if(keys.every(k => typeof decoded[k] === "number")) { return decoded; }
+        return null;
+      }catch{ return null; }
+    }
+    function getScoresFromLocalStorage(){
+      try{
+        const raw = localStorage.getItem("aiQuizResult");
+        if(!raw) return null;
+        const { answers, hybrid } = JSON.parse(raw);
+        if(!answers || !Array.isArray(answers)) return null;
+        const map = (answers.length === 15 || hybrid) ? DIMENSION_MAP_7 : DIMENSION_MAP_6;
+        const avgFor = (ix)=> average(ix.map(i=>answers[i]));
+        const base = {
+          safe: avgFor(map.safe),
+          everyday: avgFor(map.everyday),
+          prompting: avgFor(map.prompting),
+          process: avgFor(map.process),
+          integration: avgFor(map.integration),
+          sharing: avgFor(map.sharing),
+          overall: average(answers)
+        };
+        if(map.productivity){
+          base.productivity = avgFor(map.productivity);
+        }
+        try{ base.aiNps = JSON.parse(raw).aiNps; }catch{}
+        return base;
+      }catch{ return null; }
+    }
+    (function init(){
+      const scores = getScoresFromUrl() || getScoresFromLocalStorage();
+      if(!scores){ window.location.href = "index.html"; return; }
+      renderResults(scores);
+      document.getElementById("start-again").addEventListener("click", ()=>{
+        try{ localStorage.removeItem("aiQuizResult"); }catch{}
+      });
+    })();
+  </script>
+</body>
+</html>

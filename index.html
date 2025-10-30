@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Literacy Self-Check</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="quiz-card" aria-labelledby="title">
+      <h1 id="title">AI Literacy Self-Check</h1>
+      <p class="lead">
+        This quick self-check isn’t a test — it’s a snapshot of how you currently use AI at work.
+        You’ll see your level and a couple of simple next steps. Please answer honestly.
+      </p>
+
+      <form id="quiz-form" novalidate>
+        <fieldset class="block" aria-label="Your details">
+          <div class="grid-3">
+            <label class="field" style="grid-column: 1 / -1;">
+              <span>Business Unit</span>
+              <select name="businessUnit" id="businessUnit" required>
+                <option value="" disabled selected>Pick your Business Unit…</option>
+                <option value="AI & Innovation">AI & Innovation</option>
+                <option value="Consumer Services & Inside Sales">Consumer Services & Inside Sales</option>
+                <option value="Customer Acquisition">Customer Acquisition</option>
+                <option value="Development">Development</option>
+                <option value="Executive Management">Executive Management</option>
+                <option value="Finance & Business Performance">Finance & Business Performance</option>
+                <option value="GCS">GCS</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Legal & Corporate Development">Legal & Corporate Development</option>
+                <option value="Marketing, Brand & Communications">Marketing, Brand & Communications</option>
+                <option value="People & Culture">People & Culture</option>
+                <option value="Product & Ecommerce">Product & Ecommerce</option>
+                <option value="Technology">Technology</option>
+              </select>
+            </label>
+          </div>
+          <p class="tiny">We only store your Business Unit and anonymised scores to spot team‑wide trends.</p>
+        </fieldset>
+
+        <fieldset class="block" aria-labelledby="q-head">
+          <legend id="q-head">Questions (scale: Never • Rarely • Sometimes • Often • Always)</legend>
+          <ol class="q-list">
+            <li><p>I avoid entering personal or confidential data when I use AI.</p><div class="scale" data-name="q1"></div></li>
+            <li><p>I can recognise when AI might not be appropriate (e.g. sensitive cases, legal/ethical concerns) and I check with a team member if unsure.</p><div class="scale" data-name="q2"></div></li>
+            <li><p>I use AI to create or improve written communications relevant to my role (e.g. emails, FAQs, job ads, announcements).</p><div class="scale" data-name="q3"></div></li>
+            <li><p>I use AI to summarise or simplify long or complex content I work with.</p><div class="scale" data-name="q4"></div></li>
+            <li><p>When I give instructions to AI, I include details like audience, style, or format.</p><div class="scale" data-name="q5"></div></li>
+            <li><p>When AI’s first answer doesn’t quite fit, I can adjust my instructions to improve the result.</p><div class="scale" data-name="q6"></div></li>
+            <li><p>I understand what makes an effective prompt in my role.</p><div class="scale" data-name="q7"></div></li>
+            <li><p>I reuse or save instructions/templates for tasks I do repeatedly.</p><div class="scale" data-name="q8"></div></li>
+            <li><p>I review AI outputs for accuracy, inclusivity, and whether they reflect our culture appropriately before sharing.</p><div class="scale" data-name="q9"></div></li>
+            <li><p>I can spot parts of my work process where AI could help.</p><div class="scale" data-name="q10"></div></li>
+            <li><p>I use AI features in our existing tools (e.g. Copilot in Word/Excel, Power Automate, Outlook) to make my work more productive.</p><div class="scale" data-name="q11"></div></li>
+            <li><p>I look for simple, low-effort ways to integrate AI into the tools we already use.</p><div class="scale" data-name="q12"></div></li>
+            <li><p>I’ve set up or used a helper (e.g. saved template, shared prompt, automation) that makes work easier.</p><div class="scale" data-name="q13"></div></li>
+            <li><p>I share my experiences with AI (what worked or didn’t) with team members.</p><div class="scale" data-name="q14"></div></li>
+            <li><p>When you use AI tools, how often does it actually help you save time or improve quality of work?</p><div class="scale" data-name="q15"></div></li>
+          </ol>
+        </fieldset>
+
+        <fieldset class="block" aria-labelledby="nps-head">
+          <legend id="nps-head">[AI NPS] AI Productivity pulse</legend>
+          <p>On balance, has AI made you more productive in your role?</p>
+          <div class="scale" data-name="aiNps"></div>
+          <p class="tiny">This single question is stored separately as a pulse metric.</p>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn">See my results</button>
+          <p class="tiny">BU is stored for internal reporting only.</p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+</body>
+</html>
