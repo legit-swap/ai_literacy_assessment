@@ -2,195 +2,179 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Your AI Literacy Snapshot</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- Your site stylesheet (keep relative paths for GitHub Pages) -->
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Minimal safe defaults in case style.css doesn't define these */
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.5; color: #e9ecf1; background: #0b0d10; }
+    .container { max-width: 880px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #12151a; border: 1px solid #243042; border-radius: 14px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .muted { color: #aab2bf; }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid #31405a; background:#dfe6ff1a; color:#cfd7ff; font-weight:700; margin-bottom:10px;}
+    .overall { display:flex; align-items:center; gap:14px; background:#0f1319; border:1px solid #243042; padding:16px; border-radius:12px; margin:12px 0 18px }
+    .overall .score { font-size:28px; font-weight:800; background:#0c1118; padding:10px 14px; border-radius:12px; border:1px solid #243042 }
+    .metric { display:grid; grid-template-columns:220px 1fr 110px; gap:16px; align-items:center }
+    .metric + .metric { margin-top:12px }
+    .bar { height:12px; background:#e9ecf1; border-radius:9999px; overflow:hidden }
+    .bar > span { display:block; height:100%; background:#b5b9ff; width:0 }
+    .row { margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border-radius:12px; border:1px solid #243042; background:#0f1319; color:#e9ecf1; cursor:pointer; text-decoration:none; }
+    .btn:hover { background:#151c28; }
+    .footer-note { color:#9aa3b3; font-size:13px; margin-top:10px }
+  </style>
 </head>
 <body>
-  <main class="page">
-    <section id="results" class="results-card" aria-labelledby="results-title">
-      <header class="results-head">
-        <div id="level-badge" class="level-badge">Level</div>
-        <h2 id="results-title" class="results-title">Your AI Literacy Snapshot</h2>
-        <p class="results-subtitle">Below is your snapshot by area.</p>
-      </header>
+  <div class="container">
+    <span class="pill" id="levelPill">—</span>
+    <h1>Your AI Literacy Snapshot</h1>
+    <p class="muted">Below is your personalized snapshot. You can optionally record this result to Excel for the AI literacy team.</p>
 
-        <div class="overall-row" id="nps-row" hidden>
-          <div class="overall-left">
-            <div class="overall-label">AI NPS (Productivity pulse)</div>
-            <div class="overall-value" id="nps-value">– / 5</div>
-          </div>
-          <div class="overall-chip" id="nps-chip">—</div>
+    <div class="card">
+      <div class="overall">
+        <div>
+          <div class="muted">Overall score</div>
+          <div class="score" id="overallScore">0.0 / 5</div>
         </div>
-   </div>
-      <p class="tiny" id="nps-note" hidden>This pulse is separate from the set of questions and doesn’t affect your overall score.</p>
-        <div class="overall-row">
-        <div class="overall-left">
-          <div class="overall-label">Overall score</div>
-          <div class="overall-value" id="overall-value">– / 5</div>
-        </div>
-        <div class="overall-chip" id="overall-chip">—</div>
+        <div class="muted" id="buLine" style="margin-left:auto;">Business Unit: —</div>
       </div>
 
-      <div class="bars" role="group" aria-label="Scores by area">
-        <div class="bar-row">
-          <div class="bar-label">Safe &amp; Responsible Use</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-safe" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-          <div class="bar-value" id="val-safe">–/5 · —</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Everyday Use</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-everyday" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-          <div class="bar-value" id="val-everyday">–/5 · —</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Prompting &amp; Iteration</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-prompting" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-          <div class="bar-value" id="val-prompting">–/5 · —</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Process &amp; Quality</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-process" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-          <div class="bar-value" id="val-process">–/5 · —</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Integration &amp; Improvement</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-integration" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-          <div class="bar-value" id="val-integration">–/5 · —</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Sharing &amp; Collaboration</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-sharing" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-          <div class="bar-value" id="val-sharing">–/5 · —</div>
-        </div>
+      <div id="metrics"></div>
+
+      <div class="row">
+        <button id="logToExcel" class="btn">Record this in Excel</button>
+        <a class="btn" href="index.html">Retake assessment</a>
       </div>
-
-      <div id="guardrail" class="guardrail" role="status" hidden>
-        ⚠️ <strong>Safety first.</strong> You’re moving fast — strengthen privacy and bias checks before scaling your use.
-      </div>
-   </div>
-   </div>
-</div>
-</div>
-</div></div></div>
-
-
-      <h3 class="ns-title">Next steps</h3>
-      <div class="ns-buttons">
-        <a class="btn secondary" href="https://gencentral.gendigital.com/sites/people-culture/SitePageModern/55041/ai-learning-hub" target="_blank" rel="noopener">
-          Go to the AI Learning Hub
-        </a>
-      </div>
-      <p class="tiny">No emails are sent. Your results are saved to help us spot team‑wide trends.</p>
-
-      <footer class="results-footer">
-        <a class="linkish" id="start-again" href="index.html">Start again</a>
-      </footer>
-    </section>
-  </main>
+      <div class="footer-note">No emails are sent. If you choose to record, a single row is added to the Excel workbook (timestamped automatically by Microsoft Forms).</div>
+    </div>
+  </div>
 
   <script>
-    const DIMENSION_MAP_6 = { safe:[0,1], everyday:[2,3], prompting:[4,5,6], process:[7,8], integration:[9,10,11,12], sharing:[13] };
-    const DIMENSION_MAP_7 = { safe:[0,1], everyday:[2,3], prompting:[4,5,6], process:[7,8], integration:[9,10,11,12], sharing:[13], productivity:[14] };
-    const average = (arr)=>arr.reduce((a,b)=>a+b,0)/arr.length;
-    const levelFromScore = (avg)=> avg < 2.6 ? "Foundational" : (avg <= 3.8 ? "Proficient" : "Advanced");
-    const ratingLabel = (v)=> v < 2.6 ? "Needs focus" : (v <= 3.8 ? "Building" : "Strong");
-const NPS_LABELS = ["Never","Rarely","Sometimes","Often","Always"];
+    // ========= CONFIG =========
+    // Your Microsoft Forms share link (as provided)
+    const FORMS_BASE = "https://forms.office.com/Pages/ResponsePage.aspx?id=HWuYlG9GwE-rS1xyVgPeqy353c6VaipIj9MJjWAPy2lUNUVROFZWQkZKOVkyTVlDUlBQSVNXTFRORi4u";
 
-    function setBar(idFill,idVal,value){
-      const pct = Math.max(0, Math.min(100, ((value-1)/4)*100));
-      const fill = document.getElementById(idFill);
-      const val  = document.getElementById(idVal);
-      fill.style.width = pct + "%";
-      fill.setAttribute("aria-valuenow", value.toFixed(1));
-      val.textContent = `${value.toFixed(1)}/5 · ${ratingLabel(value)}`;
+    // These MUST match your Form field titles exactly (case/spaces).
+    const FIELD_NAMES = {
+      businessUnit: "Business Unit",
+      overallScore: "Overall Score",
+      categoryScores: "Category Scores"  // single JSON column of all categories
+      // If you prefer separate columns, see the commented "OPTION B" code below.
+    };
+    // ========= END CONFIG =========
+
+    const CAT_LABELS = {
+      safe: "Safe & Responsible Use",
+      everyday: "Everyday Use",
+      prompting: "Prompting & Iteration",
+      process: "Process & Quality",
+      integration: "Integration & Improvement",
+      sharing: "Sharing & Collaboration",
+      productivity: "Productivity"
+    };
+    const ORDER = ["safe","everyday","prompting","process","integration","sharing"];
+
+    function levelFromScore(s){
+      if(s >= 4.5) return "Expert";
+      if(s >= 4.0) return "Advanced";
+      if(s >= 3.5) return "Strong";
+      if(s >= 3.0) return "Building";
+      return "Starting";
     }
-    function appendProductivityBar(){
-      if(document.getElementById("bar-productivity")) return;
-      const container = document.querySelector(".bars");
-      const row = document.createElement("div");
-      row.className = "bar-row";
+
+    function enc(v){ return encodeURIComponent(String(v ?? "")); }
+
+    function renderBarRow(name, value){
+      const pct = Math.max(0, Math.min(100, (Number(value||0)/5)*100));
+      const row = document.createElement('div');
+      row.className = "metric";
       row.innerHTML = `
-        <div class="bar-label">Productivity (Time/quality gain)</div>
-        <div class="bar-track"><div class="bar-fill" id="bar-productivity" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0"></div></div>
-        <div class="bar-value" id="val-productivity">–/5 · —</div>
+        <div>${name}</div>
+        <div class="bar"><span style="width:${pct}%"></span></div>
+        <div>${(Number(value)||0).toFixed(1)}/5</div>
       `;
-      container.appendChild(row);
+      return row;
     }
-    function renderResults(scores){
-      const aiNps = scores.aiNps;
-      const {safe,everyday,prompting,process,integration,sharing,overall,productivity} = scores;
-      const level = levelFromScore(overall);
-      document.getElementById("level-badge").textContent = level;
-      document.getElementById("overall-value").textContent = `${overall.toFixed(1)} / 5`;
-      document.getElementById("overall-chip").textContent = level;
 
-      setBar("bar-safe","val-safe",safe);
-      setBar("bar-everyday","val-everyday",everyday);
-      setBar("bar-prompting","val-prompting",prompting);
-      setBar("bar-process","val-process",process);
-      setBar("bar-integration","val-integration",integration);
-      setBar("bar-sharing","val-sharing",sharing);
-
-      if(typeof productivity === "number"){
-        appendProductivityBar();
-        setBar("bar-productivity","val-productivity",productivity);
-      }
-
-      // Render AI NPS if present
-      if(typeof aiNps === "number"){
-        const row = document.getElementById("nps-row");
-        row.hidden = false;
-        const lab = NPS_LABELS[Math.max(1, Math.min(5, aiNps)) - 1] || "—";
-        document.getElementById("nps-value").textContent = `${aiNps}/5`;
-        const note = document.getElementById("nps-note");
-        if (note) note.hidden = false;
-        document.getElementById("nps-chip").textContent = lab;
-      }
-
-      const guard = document.getElementById("guardrail");
-      guard.hidden = !(overall >= 3.0 && safe < 2.4);
+    function readPayloadFromParam(){
+      const p = new URLSearchParams(location.search).get("p");
+      if(!p) return null;
+      try { return JSON.parse(atob(p)); } catch { return null; }
     }
-    function getScoresFromUrl(){
-      try{
-        const p = new URLSearchParams(location.search).get("p");
-        if(!p) return null;
-        const decoded = JSON.parse(atob(decodeURIComponent(p)));
-        const keys = ["safe","everyday","prompting","process","integration","sharing","overall"];
-        if(keys.every(k => typeof decoded[k] === "number")) { return decoded; }
-        return null;
-      }catch{ return null; }
+
+    function readBusinessUnit(){
+      // Your app stored BU in localStorage when the form was filled
+      try {
+        const ls = JSON.parse(localStorage.getItem("aiQuizResult") || "{}");
+        if (ls && ls.businessUnit) return ls.businessUnit;
+      } catch {}
+      return null;
     }
-    function getScoresFromLocalStorage(){
-      try{
-        const raw = localStorage.getItem("aiQuizResult");
-        if(!raw) return null;
-        const { answers, hybrid } = JSON.parse(raw);
-        if(!answers || !Array.isArray(answers)) return null;
-        const map = (answers.length === 15 || hybrid) ? DIMENSION_MAP_7 : DIMENSION_MAP_6;
-        const avgFor = (ix)=> average(ix.map(i=>answers[i]));
-        const base = {
-          safe: avgFor(map.safe),
-          everyday: avgFor(map.everyday),
-          prompting: avgFor(map.prompting),
-          process: avgFor(map.process),
-          integration: avgFor(map.integration),
-          sharing: avgFor(map.sharing),
-          overall: average(answers)
-        };
-        if(map.productivity){
-          base.productivity = avgFor(map.productivity);
-        }
-        try{ base.aiNps = JSON.parse(raw).aiNps; }catch{}
-        return base;
-      }catch{ return null; }
-    }
+
     (function init(){
-      const scores = getScoresFromUrl() || getScoresFromLocalStorage();
-      if(!scores){ window.location.href = "index.html"; return; }
-      renderResults(scores);
-      document.getElementById("start-again").addEventListener("click", ()=>{
-        try{ localStorage.removeItem("aiQuizResult"); }catch{}
+      const data = readPayloadFromParam() || {};
+      const bu = readBusinessUnit();
+
+      // Prepare categories object with only present keys (and order)
+      const categories = {};
+      ORDER.forEach(k => { if (typeof data[k] === "number") categories[k] = data[k]; });
+      if (typeof data.productivity === "number") {
+        categories.productivity = data.productivity;
+        if (!ORDER.includes("productivity")) ORDER.push("productivity");
+      }
+
+      // Overall + level
+      const overall = Number(data.overall || 0);
+      document.getElementById("overallScore").textContent = `${overall.toFixed(1)} / 5`;
+      document.getElementById("levelPill").textContent = levelFromScore(overall);
+      if (bu) document.getElementById("buLine").textContent = `Business Unit: ${bu}`;
+
+      // Bars
+      const metricsEl = document.getElementById("metrics");
+      metricsEl.innerHTML = "";
+      ORDER.forEach(cat => {
+        if (typeof categories[cat] === "number") {
+          metricsEl.appendChild(renderBarRow(CAT_LABELS[cat] || cat, categories[cat]));
+        }
+      });
+
+      // Record to Excel (prefill MS Form)
+      document.getElementById("logToExcel").addEventListener("click", () => {
+        if (!bu || !Number.isFinite(overall)) {
+          alert("Missing Business Unit or Score — please complete the assessment first.");
+          return;
+        }
+
+        // ===== OPTION A: single JSON column with all category scores =====
+        const params = [
+          [FIELD_NAMES.businessUnit, bu],
+          [FIELD_NAMES.overallScore, overall.toFixed(2)],
+          [FIELD_NAMES.categoryScores, JSON.stringify(categories)]
+        ].map(([k,v]) => `${encodeURIComponent(k)}=${enc(v)}`).join("&");
+
+        const url = `${FORMS_BASE}&${params}`;
+        window.open(url, "_blank");
+
+        // ===== OPTION B: separate columns in Excel (uncomment if your Form has these fields) =====
+        /*
+        const params = [
+          [FIELD_NAMES.businessUnit, bu],
+          [FIELD_NAMES.overallScore, overall.toFixed(2)],
+          ["Safe", categories.safe ?? ""],
+          ["Everyday", categories.everyday ?? ""],
+          ["Prompting", categories.prompting ?? ""],
+          ["Process", categories.process ?? ""],
+          ["Integration", categories.integration ?? ""],
+          ["Sharing", categories.sharing ?? ""],
+          ["Productivity", categories.productivity ?? ""], // include only if your Form added it
+        ].map(([k,v]) => `${encodeURIComponent(k)}=${enc(v)}`).join("&");
+        const url = `${FORMS_BASE}&${params}`;
+        window.open(url, "_blank");
+        */
       });
     })();
   </script>
