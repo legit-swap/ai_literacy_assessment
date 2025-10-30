@@ -38,7 +38,7 @@
               </select>
             </label>
           </div>
-          <p class="tiny">We only store your Business Unit and anonymised scores to spot team‑wide trends.</p>
+          <p class="tiny">We only store your Business Unit and anonymised scores to spot team-wide trends.</p>
         </fieldset>
 
         <fieldset class="block" aria-labelledby="q-head">
@@ -76,6 +76,12 @@
       </form>
     </section>
   </main>
+
+  <!-- set the endpoint for auto-logging (must be before index.js) -->
+  <script>
+    window.FLOW_URL = "https://super-sea-054a.swapneel-kulkarni.workers.dev/submit";
+    window.FLOW_SECRET = ""; // not used, leave blank
+  </script>
 
   <script src="index.js"></script>
 </body>
