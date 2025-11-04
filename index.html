@@ -42,6 +42,7 @@
         </fieldset>
 
         <fieldset class="block" aria-labelledby="q-head">
+          <legend id="q-head">Questions (scale: Never • Rarely • Sometimes • Often • Always)</legend>
           <ol class="q-list">
             <li><p>I avoid entering personal or confidential data when I use AI.</p><div class="scale" data-name="q1"></div></li>
             <li><p>I can recognise when AI might not be appropriate (e.g. sensitive cases, legal/ethical concerns) and I check with a team member if unsure.</p><div class="scale" data-name="q2"></div></li>
@@ -76,11 +77,12 @@
     </section>
   </main>
 
-  <!-- Inject our Worker endpoint (so index.js posts to it) -->
+  <!-- Set your Worker endpoint + secret so index.js sends authorized requests -->
   <script>
     window.FLOW_URL = "https://super-sea-054a.swapneel-kulkarni.workers.dev/submit";
-    window.FLOW_SECRET = ""; // optional shared key if you add one in the Worker/Access
+    window.FLOW_SECRET = "gen_internal_8437928"; 
   </script>
+
   <script src="index.js"></script>
 </body>
 </html>
