@@ -1,18 +1,19 @@
-// ===== AI Literacy Self-Check — front-end logic (preserves visuals) =====
-// Config toggle (choose variant without touching HTML):
+// ===== AI Literacy Self-Check — front-end logic =====
+
+// Toggle variant:
 // - HYBRID = true  -> includes Q15 (Productivity/time-save as a 7th dimension) + AI NPS
-// - HYBRID = false -> excludes Q15 (keeps 6 dimensions only) + AI NPS still captured
-const HYBRID = true; // set to false for "master + AI NPS only"
+// - HYBRID = false -> 6 dimensions only + AI NPS
+const HYBRID = true;
 
-// Endpoint/secret:
-// Prefer globals injected by index.html (window.FLOW_URL / window.FLOW_SECRET).
-// Fallback to placeholders if not provided.
+// Endpoint/secret: prefer globals from index.html
 const FLOW_URL =
-  (typeof window !== "undefined" && window.FLOW_URL) || "<<PA_FLOW_URL>>";
-const FLOW_SECRET =
-  (typeof window !== "undefined" && window.FLOW_SECRET) || "<<PA_SHARED_SECRET>>";
+  (typeof window !== "undefined" && window.FLOW_URL) ||
+  "/.netlify/functions/submit"; // fallback not used for CF Worker
 
-// Build 1–5 Likert radios for each .scale block
+const FLOW_SECRET =
+  (typeof window !== "undefined" && window.FLOW_SECRET) || ""; // optional header
+
+// Build 1–5 radios (Q15 uses custom labels)
 const LABELS = ["Never", "Rarely", "Sometimes", "Often", "Always"];
 const TIME_LABELS = [
   "None / Hardly any",
@@ -29,15 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     source.forEach((lab, i) => {
       const id = `${name}_${i + 1}`;
       const label = document.createElement("label");
-      label.innerHTML = `<input type="radio" id="${id}" name="${name}" value="${
-        i + 1
-      }" required /> ${lab}`;
+      label.innerHTML = `<input type="radio" id="${id}" name="${name}" value="${i + 1}" required /> ${lab}`;
       wrap.appendChild(label);
     });
   });
 });
 
-// Dimension mapping: indices into the answers array (0-based)
+// Dimension mapping
 const DIMENSION_MAP_6 = {
   safe: [0, 1],
   everyday: [2, 3],
@@ -46,7 +45,6 @@ const DIMENSION_MAP_6 = {
   integration: [9, 10, 11, 12],
   sharing: [13],
 };
-// With Q15 as a separate 7th dimension (time/productivity)
 const DIMENSION_MAP_7 = {
   safe: [0, 1],
   everyday: [2, 3],
@@ -87,7 +85,7 @@ form.addEventListener("submit", (e) => {
     answers.push(Number(val.value));
   }
 
-  // Optional: AI NPS (five-point scale, not part of the average score)
+  // Optional AI NPS
   let aiNps = null;
   const npsSel = form.querySelector('input[name="aiNps"]:checked');
   if (npsSel) aiNps = Number(npsSel.value);
@@ -100,7 +98,7 @@ form.addEventListener("submit", (e) => {
   const overall = average(answers);
   const scores = { ...scoreObj, overall };
 
-  // Persist to localStorage for results page fallback
+  // Persist minimal data for results page fallback
   try {
     localStorage.setItem(
       "aiQuizResult",
@@ -114,9 +112,9 @@ form.addEventListener("submit", (e) => {
     );
   } catch {}
 
-  // Try to POST (best-effort, non-blocking)
+  // POST (best-effort, non-blocking)
   try {
-    if (FLOW_URL && FLOW_URL.startsWith("http")) {
+    if (FLOW_URL && typeof FLOW_URL === "string" && FLOW_URL.startsWith("http")) {
       const payloadOut = {
         timestamp: new Date().toISOString(),
         businessUnit: bu,
@@ -131,6 +129,7 @@ form.addEventListener("submit", (e) => {
         aiNps,
         toolVersion: HYBRID ? "v4-hybrid" : "v4-nps-only",
       };
+
       const headers = { "Content-Type": "application/json" };
       if (FLOW_SECRET) headers["x-tool-key"] = FLOW_SECRET;
 
@@ -142,70 +141,9 @@ form.addEventListener("submit", (e) => {
         keepalive: true,
       }).catch(() => {});
     }
-  } catch (e) {
-    /* ignore network errors */
-  }
+  } catch {}
 
-  // Continue to results (pass scores via URL for immediate render)
+  // Continue to results
   const p = btoa(JSON.stringify({ ...scores, hybrid: HYBRID, aiNps }));
   window.location.href = `results.html?p=${encodeURIComponent(p)}`;
 });
-
-// --- (Optional) relabel helpers preserved for Q15 text/labels from Martina ---
-
-(function () {
-  function relabelQ15() {
-    try {
-      const inputs = document.querySelectorAll('input[name="q15"]');
-      if (!inputs || !inputs.length) return;
-      const labels = TIME_LABELS.slice();
-      let idx = 0;
-      inputs.forEach((inp) => {
-        if (idx >= labels.length) return;
-        const id = inp.getAttribute("id");
-        let lab = id ? document.querySelector(`label[for="${id}"]`) : null;
-        if (!lab && inp.nextElementSibling?.tagName?.toLowerCase() === "label") {
-          lab = inp.nextElementSibling;
-        }
-        if (lab) {
-          const span = lab.querySelector("span");
-          if (span) span.textContent = labels[idx];
-          else lab.textContent = labels[idx];
-          idx++;
-        }
-      });
-    } catch {}
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", relabelQ15);
-  } else {
-    relabelQ15();
-  }
-})();
-
-(function () {
-  function setQ15QuestionText() {
-    try {
-      const node = document.querySelector('div.scale[data-name="q15"]');
-      if (!node) return;
-      const li = node.closest("li");
-      if (!li) return;
-      const p =
-        li.querySelector("p") ||
-        li.insertBefore(document.createElement("p"), li.firstChild);
-      if (
-        p &&
-        p.textContent.trim() !==
-          "Roughly how much time do you save when you use AI tools?"
-      ) {
-        p.textContent =
-          "Roughly how much time do you save when you use AI tools?";
-      }
-    } catch {}
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setQ15QuestionText);
-  } else {
-    setQ15QuestionText();
-  }
-})();
